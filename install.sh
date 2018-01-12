@@ -31,8 +31,8 @@ fi
 gpasswd -a $username sudo
 #su - lgili
 
-cd home/$username
-git clone https://github.com/lgili/gili.io.git
+#cd home/$username
+git clone https://github.com/lgili/gili.io.git /home/django_gili
 mv gili.io django
 cd django
 
@@ -55,8 +55,8 @@ After=network.target
 [Service]
 User=$username
 Group=www-data
-WorkingDirectory=/home/$username/django
-ExecStart=/home/$username/django/django_env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/$username/django/django_project.sock django_project.wsgi:application
+WorkingDirectory=/home/django_gili/django
+ExecStart=/home/django_gili/django/django_env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/django_gili/django/django_project.sock django_project.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
@@ -75,12 +75,12 @@ server {
 
     location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
-        root /home/$username/django;
+        root /home/django_gili/django;
     }
 
     location / {
         include proxy_params;
-        proxy_pass http://unix:/home/$username/django/django_project.sock;
+        proxy_pass http://unix:/home/django_gili/django/django_project.sock;
     }
 }
 
