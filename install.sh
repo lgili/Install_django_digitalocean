@@ -43,6 +43,53 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic 
 
-sudo ufw allow 8000
-python manage.py runserver 0.0.0.0:8000
+#sudo ufw allow 8000
+#python manage.py runserver 0.0.0.0:8000
+deactivate
+
+cat <<EOF > /etc/systemd/system/gunicorn.service
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=$username
+Group=www-data
+WorkingDirectory=/home/$username/django
+ExecStart=/home/$username/django/django_env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/$username/django/django_project.sock django_project.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+sudo systemctl daemon-reload
+sudo systemctl restart gunicorn
+
+
+cat <<EOF > /etc/nginx/sites-available/django_project
+server {
+    listen 80;
+    server_name 104.131.59.213 gili.io www.gili.io;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/$username/django;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/$username/django/django_project.sock;
+    }
+}
+
+EOF
+
+
+sudo ln -s /etc/nginx/sites-available/django_project /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+sudo ufw allow 'Nginx Full'
+
 echo "pronto!"
