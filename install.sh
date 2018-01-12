@@ -28,10 +28,10 @@ else
 	exit 2
 fi
 
-gpasswd -a lgili sudo
+gpasswd -a $username sudo
 #su - lgili
 
-cd home/lgili
+cd home/$username
 git clone https://github.com/lgili/gili.io.git
 mv gili.io django
 cd django
