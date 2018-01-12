@@ -28,8 +28,8 @@ else
 	exit 2
 fi
 
-
-su - lgili
+gpasswd -a lgili sudo
+#su - lgili
 
 cd home/lgili
 git clone https://github.com/lgili/gili.io.git
