@@ -32,15 +32,15 @@ gpasswd -a $username sudo
 #su - lgili
 
 #cd home/$username
-git clone https://github.com/lgili/gili.io.git /home/django_gili
+git clone https://github.com/lgili/gili.io.git /home/lgili
 mv gili.io django
-cd django
+cd /home/django_gili/django
 
 virtualenv django_env
 source django_env/bin/activate
 pip install -r requirements.txt
 python manage.py makemigrations
-python manage.py migrate
+python manage.py makemigrations
 python manage.py collectstatic 
 
 #sudo ufw allow 8000
@@ -93,3 +93,5 @@ sudo systemctl restart nginx
 sudo ufw allow 'Nginx Full'
 
 echo "pronto!"
+lets encrypt
+sudo certbot --authenticator standalone --installer nginx -d <domain> --pre-hook "service nginx stop" --post-hook "service nginx start"
